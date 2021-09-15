@@ -1,7 +1,7 @@
 from os import environ
 from fastapi import FastAPI
-from pydantic import EmailStr,AnyUrl
-import pymongo, uvicorn, ssl
+from pydantic import EmailStr
+import pymongo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -115,5 +115,3 @@ def delete_links(fetch: links):
 
     else:
         {"message": "Invalid credentials"}
-
-
