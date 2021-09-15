@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash
 
 app = FastAPI()
 
-myclient = pymongo.MongoClient(environ.get(DBURL=" mongodb+srv://m001-student:m001-mongodb-basics@sandbox.br4vj.mongodb.net/linktree?retryWrites=true&w=majority"))
+myclient = pymongo.MongoClient(environ.get('DBURL'))
 linktree = myclient["linktree"]
 register_info = linktree["registerinfo"]
 
