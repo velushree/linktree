@@ -7,9 +7,7 @@ from werkzeug.security import check_password_hash
 
 app = FastAPI()
 
-myclient = pymongo.MongoClient( "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.br4vj.mongodb.net/linktree?retryWrites=true&w=majority",
-    ssl_cert_reqs=ssl.CERT_NONE,
-)
+myclient = pymongo.MongoClient(environ.get(DBURL=" mongodb+srv://m001-student:m001-mongodb-basics@sandbox.br4vj.mongodb.net/linktree?retryWrites=true&w=majority"))
 linktree = myclient["linktree"]
 register_info = linktree["registerinfo"]
 
@@ -118,5 +116,4 @@ def delete_links(fetch: links):
     else:
         {"message": "Invalid credentials"}
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info", debug=True)
+
