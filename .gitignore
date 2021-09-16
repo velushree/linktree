@@ -2,4 +2,3 @@ backup.py
 __pycache__/
 venv
 .vscode
-procfile
