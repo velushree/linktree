@@ -2,3 +2,5 @@ backup.py
 __pycache__/
 venv
 .vscode
+auth.py
+beta.py

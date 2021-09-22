@@ -1,23 +1,26 @@
+from os import name
 from pydantic import BaseModel, EmailStr, AnyUrl
 from typing import Optional
 
 
-class User(BaseModel):
-    name: str
+class sign_up(BaseModel):
+    username: str
     email: EmailStr
     password: str
-    metadata: Optional[str] = None
 
 
 class links(BaseModel):
-    email: EmailStr
-    password: str
+    username: str
     link_name: str
     link: AnyUrl
 
 
 class editlinks(BaseModel):
-    email: EmailStr
-    password: str
+    username: str
     link_name: str
     new_link: AnyUrl
+
+
+class deletelinks(BaseModel):
+    username: str
+    link_name: str
