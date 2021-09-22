@@ -16,10 +16,7 @@ app = FastAPI()
 
 SECRETKEY = "668101015464f3c7d0fbaee20bd44cb999437d7d817480613105611a0b2a6f24"
 
-myclient = pymongo.MongoClient(
-    "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.br4vj.mongodb.net/linktree?retryWrites=true&w=majority",
-    ssl_cert_reqs=ssl.CERT_NONE,
-)
+myclient = pymongo.MongoClient(environ.get("DBURL"))
 linktree = myclient["linktree"]
 register_info = linktree["registerinfo"]
 
