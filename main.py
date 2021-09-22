@@ -14,7 +14,7 @@ ouath2_Scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
 
-SECRETKEY = "668101015464f3c7d0fbaee20bd44cb999437d7d817480613105611a0b2a6f24"
+SECRETKEY = environ.get("SECRETKEY")
 
 myclient = pymongo.MongoClient(environ.get("DBURL"))
 linktree = myclient["linktree"]
