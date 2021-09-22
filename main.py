@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Depends
 from fastapi import FastAPI, HTTPException
 from fastapi import FastAPI
-import pymongo, ssl
+import pymongo
 from datetime import timedelta, datetime
 from jose import jwt
 from werkzeug.security import generate_password_hash
@@ -137,7 +137,7 @@ def delete_links(fetch: deletelinks, token: str = Depends(ouath2_Scheme)):
 
 
 @app.get("/view/{username}")
-def view(username: str, token: str = Depends(ouath2_Scheme)):
+def view(username: str):
     x = register_info.find_one({"username": username})
     if x:
         del x["_id"]
@@ -148,6 +148,6 @@ def view(username: str, token: str = Depends(ouath2_Scheme)):
 
 
 @app.get("/alluser")
-def viewall(token: str = Depends(ouath2_Scheme)):
+def viewall():
     users = [sign_up(**user).username for user in register_info.find()]
     return {"all_user_names": users}
