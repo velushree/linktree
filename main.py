@@ -1,19 +1,26 @@
+from datetime import datetime, timedelta
 from os import environ
-from re import X
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import Depends
-from fastapi import FastAPI, HTTPException
-from fastapi import FastAPI
+
 import pymongo
-from datetime import timedelta, datetime
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
-from db import delLink, sign_up, Link, Links
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from db import Link, Links, delLink, sign_up
 
 ouath2_Scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 SECRETKEY = environ.get("SECRETKEY")
 
