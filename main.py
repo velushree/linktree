@@ -83,7 +83,7 @@ def signup(login_data: sign_up):
     else:
         login_data.password = generate_password_hash(login_data.password)
 
-        register_info.insert_one(login_data.dict() | {'links': []})
+        register_info.insert_one(login_data.dict() | {"links": []})
 
         x = register_info.find_one({"username": login_data.username})
 
@@ -101,13 +101,13 @@ def post_links(fetch: Links, token: str = Depends(ouath2_Scheme)):
     if a:
         copy = a.copy()
         y = [link.dict() for link in fetch.links]
-        copy['links'].extend(y)
+        copy["links"].extend(y)
         a.update(copy)
         data = register_info.find_one_and_replace({"username": username}, a)
 
         return Links(**data)
     else:
-        return {'error': 'username not found'}
+        return {"error": "username not found"}
 
 
 @app.post("/editlinks")
@@ -119,13 +119,13 @@ def edit_links(fetch: Links, token: str = Depends(ouath2_Scheme)):
     if a:
         copy = a.copy()
         y = [link.dict() for link in fetch.links]
-        copy['links'] = y
+        copy["links"] = y
         a.update(copy)
         data = register_info.find_one_and_replace({"username": username}, a)
 
         return Links(**data)
     else:
-        return {'error': 'username not found'}
+        return {"error": "username not found"}
 
 
 @app.post("/deletelinks")
@@ -137,7 +137,7 @@ def delete_links(data: delLink, token: str = Depends(ouath2_Scheme)):
     a = register_info.find_one({"username": username})
     req = None
     if a:
-        links: list = a['links']
+        links: list = a["links"]
         for link in links:
             l = Link(**link)
             if l.link_name == link_name:
@@ -145,13 +145,13 @@ def delete_links(data: delLink, token: str = Depends(ouath2_Scheme)):
             else:
                 continue
         if req:
-            del a['links'][req]
-            register_info.find_one_and_replace({'username': username}, a)
+            del a["links"][req]
+            register_info.find_one_and_replace({"username": username}, a)
             return Links(**a)
         else:
-            return {'error': 'link_name not found'}
+            return {"error": "link_name not found"}
     else:
-        return {'error': 'username not found'}
+        return {"error": "username not found"}
 
 
 @app.get("/view/{username}")

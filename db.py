@@ -12,6 +12,7 @@ class Links(BaseModel):
     username: str
     links: list[Link]
 
+
 class sign_up(BaseModel):
     username: str
     email: EmailStr
