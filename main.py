@@ -1,18 +1,26 @@
+from datetime import datetime, timedelta
 from os import environ
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import Depends
-from fastapi import FastAPI, HTTPException
-from fastapi import FastAPI
+
 import pymongo
-from datetime import timedelta, datetime
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
-from db import links, editlinks, sign_up, deletelinks
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from db import Link, Links, delLink, sign_up
 
 ouath2_Scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 SECRETKEY = environ.get("SECRETKEY")
 
@@ -75,7 +83,7 @@ def signup(login_data: sign_up):
     else:
         login_data.password = generate_password_hash(login_data.password)
 
-        register_info.insert_one(login_data.dict())
+        register_info.insert_one(login_data.dict() | {"links": []})
 
         x = register_info.find_one({"username": login_data.username})
 
@@ -85,55 +93,65 @@ def signup(login_data: sign_up):
 
 
 @app.post("/postlinks")
-def post_links(fetch: links, token: str = Depends(ouath2_Scheme)):
+def post_links(fetch: Links, token: str = Depends(ouath2_Scheme)):
 
     username: str = fetch.username
 
     a = register_info.find_one({"username": username})
-    x = a | {fetch.link_name: fetch.link}
+    if a:
+        copy = a.copy()
+        y = [link.dict() for link in fetch.links]
+        copy["links"].extend(y)
+        a.update(copy)
+        data = register_info.find_one_and_replace({"username": username}, a)
 
-    if register_info.find_one({fetch.link_name: fetch.link}):
-
-        return {
-            "message": "There is already a link in this in this name.Try using other name"
-        }
-
+        return Links(**data)
     else:
-
-        register_info.find_one_and_replace({"username": username}, x)
-
-    return {"message": f"link:{fetch.link_name} sucessfully added"}
+        return {"error": "username not found"}
 
 
 @app.post("/editlinks")
-def edit_links(authorization: editlinks, token: str = Depends(ouath2_Scheme)):
+def edit_links(fetch: Links, token: str = Depends(ouath2_Scheme)):
 
-    if register_info.find_one({authorization.link_name: authorization.new_link}):
-        register_info.update_one(
-            {"username": authorization.username},
-            {"$set": {authorization.link_name: authorization.new_link}},
-        )
-        return {"message": f"link:{authorization.link_name} sucessfully_updated"}
+    username: str = fetch.username
+
+    a = register_info.find_one({"username": username})
+    if a:
+        copy = a.copy()
+        y = [link.dict() for link in fetch.links]
+        copy["links"] = y
+        a.update(copy)
+        data = register_info.find_one_and_replace({"username": username}, a)
+
+        return Links(**data)
     else:
-        return {
-            "error": f"No such link is identified in the name of {authorization.link_name} ..."
-        }
+        return {"error": "username not found"}
 
 
 @app.post("/deletelinks")
-def delete_links(fetch: deletelinks, token: str = Depends(ouath2_Scheme)):
+def delete_links(data: delLink, token: str = Depends(ouath2_Scheme)):
 
-    if register_info.find_one({"username": fetch.username}):
-        if register_info.update(
-            {"username": fetch.username}, {"$unset": {fetch.link_name: "Default"}}
-        ):
-            return {"message": f" link {fetch.link_name} sucessfully deleted"}
+    username = data.username
+    link_name = data.link_name
+
+    a = register_info.find_one({"username": username})
+    req = None
+    if a:
+        links: list = a["links"]
+        for link in links:
+            l = Link(**link)
+            if l.link_name == link_name:
+                req = links.index(link)
+            else:
+                continue
+        if req:
+            del a["links"][req]
+            register_info.find_one_and_replace({"username": username}, a)
+            return Links(**a)
         else:
-            return {
-                "error": f"No such link is identifide in the name of {fetch.link_name}"
-            }
+            return {"error": "link_name not found"}
     else:
-        return {"error": f"invali username:{fetch.username}"}
+        return {"error": "username not found"}
 
 
 @app.get("/view/{username}")

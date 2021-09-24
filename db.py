@@ -1,6 +1,16 @@
 from os import name
-from pydantic import BaseModel, EmailStr, AnyUrl
 from typing import Optional
+from pydantic import BaseModel, EmailStr, AnyUrl
+
+
+class Link(BaseModel):
+    link_name: str
+    link_url: AnyUrl
+
+
+class Links(BaseModel):
+    username: str
+    links: list[Link]
 
 
 class sign_up(BaseModel):
@@ -9,18 +19,6 @@ class sign_up(BaseModel):
     password: str
 
 
-class links(BaseModel):
-    username: str
-    link_name: str
-    link: AnyUrl
-
-
-class editlinks(BaseModel):
-    username: str
-    link_name: str
-    new_link: AnyUrl
-
-
-class deletelinks(BaseModel):
+class delLink(BaseModel):
     username: str
     link_name: str
