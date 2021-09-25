@@ -1,5 +1,3 @@
-from os import name
-from typing import Optional
 from pydantic import BaseModel, EmailStr, AnyUrl
 
 
