@@ -144,7 +144,7 @@ def delete_links(data: delLink, token: str = Depends(ouath2_Scheme)):
                 req = links.index(link)
             else:
                 continue
-        if req:
+        if req is not None:
             del a["links"][req]
             register_info.find_one_and_replace({"username": username}, a)
             return Links(**a)
